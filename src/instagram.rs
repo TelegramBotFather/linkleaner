@@ -15,7 +15,7 @@ use teloxide::{
 
 const HOST_MATCH_GROUP: &str = "host";
 
-pub static MATCH_REGEX: Lazy<Regex> = Lazy::new(|| {
+static MATCH_REGEX: Lazy<Regex> = Lazy::new(|| {
     Regex::new("^https://(?:www.)?(?P<host>instagram.com)/(p|reel|tv)/[A-Za-z0-9]+.*/").unwrap()
 });
 

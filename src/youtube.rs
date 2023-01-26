@@ -13,7 +13,7 @@ use teloxide::{
     Bot,
 };
 
-pub static MATCH_REGEX: Lazy<Regex> = Lazy::new(|| {
+static MATCH_REGEX: Lazy<Regex> = Lazy::new(|| {
     Regex::new("^https://(?:www.)?youtube.com/(?P<shorts>shorts/)[A-Za-z0-9-]{11}.*").unwrap()
 });
 

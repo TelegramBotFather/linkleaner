@@ -22,8 +22,7 @@ use teloxide::{
     types::{Message, Update},
     Bot,
 };
-
-const REPLACE_SKIP_TOKEN: &str = "#skip";
+use url::Host;
 
 async fn run() {
     if let Err(e) = logging::init() {
@@ -42,39 +41,46 @@ async fn run() {
         )
         .branch(
             dptree::filter(|msg: Message| {
-                twitter::FILTER_ENABLED.load(Ordering::Relaxed)
-                    && msg
-                        .text()
-                        .map(|text| {
-                            twitter::MATCH_REGEX.is_match(text)
-                                && !text.contains(REPLACE_SKIP_TOKEN)
+                let urls = utils::get_urls_from_message(&msg);
+                let urls = utils::get_typed_urls(urls);
+                let has_twitter_url = urls.iter().any(|url| {
+                    url.host()
+                        .map(|f| {
+                            f == Host::Domain("twitter.com")
+                                || f == Host::Domain("mobile.twitter.com")
                         })
-                        .unwrap_or_default()
+                        .is_some()
+                });
+                twitter::FILTER_ENABLED.load(Ordering::Relaxed) && has_twitter_url
             })
             .endpoint(twitter::handler),
         );
     #[cfg(feature = "ddinstagram")]
     let handler = handler.branch(
         dptree::filter(|msg: Message| {
-            instagram::FILTER_ENABLED.load(Ordering::Relaxed)
-                && msg
-                    .text()
-                    .map(|text| {
-                        instagram::MATCH_REGEX.is_match(text) && !text.contains(REPLACE_SKIP_TOKEN)
-                    })
-                    .unwrap_or_default()
+            let urls = utils::get_urls_from_message(&msg);
+            let urls = utils::get_typed_urls(urls);
+            let has_instagram_url = urls.iter().any(|url| {
+                url.host()
+                    .map(|f| f == Host::Domain("instagram.com"))
+                    .is_some()
+            });
+            instagram::FILTER_ENABLED.load(Ordering::Relaxed) && has_instagram_url
         })
         .endpoint(instagram::handler),
     );
     let handler = handler.branch(
         dptree::filter(|msg: Message| {
-            youtube::FILTER_ENABLED.load(Ordering::Relaxed)
-                && msg
-                    .text()
-                    .map(|text| {
-                        youtube::MATCH_REGEX.is_match(text) && !text.contains(REPLACE_SKIP_TOKEN)
+            let urls = utils::get_urls_from_message(&msg);
+            let urls = utils::get_typed_urls(urls);
+            let has_youtube_url = urls.iter().any(|url| {
+                url.host()
+                    .map(|f| {
+                        f == Host::Domain("youtube.com") || f == Host::Domain("www.youtube.com")
                     })
-                    .unwrap_or_default()
+                    .is_some()
+            });
+            youtube::FILTER_ENABLED.load(Ordering::Relaxed) && has_youtube_url
         })
         .endpoint(youtube::handler),
     );

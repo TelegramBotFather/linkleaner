@@ -33,6 +33,10 @@ pub(crate) fn get_urls_from_message(msg: &Message) -> Vec<String> {
     Vec::new()
 }
 
+pub(crate) fn get_typed_urls(urls: Vec<String>) -> Vec<Url> {
+    urls.iter().flat_map(|url| Url::parse(url)).collect()
+}
+
 pub(crate) fn scrub_urls(msg: &Message) -> Option<String> {
     if let Some(text) = msg.text() {
         let urls = get_urls_from_message(msg);
