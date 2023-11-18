@@ -12,13 +12,14 @@ mod youtube;
 
 use crate::commands::Command;
 use crate::logging::TeloxideLogger;
+use commands::FixerState;
 use dotenvy::dotenv;
-use std::sync::{atomic::Ordering, Arc};
+use std::{sync::{atomic::Ordering, Arc}, collections::HashMap};
 use teloxide::{
     dispatching::{update_listeners::Polling, HandlerExt, UpdateFilterExt},
     dptree,
     prelude::Dispatcher,
-    types::{Message, Update},
+    types::{Message, Update, ChatId},
     Bot,
 };
 
@@ -31,13 +32,14 @@ async fn run() {
     };
     dotenv().ok();
 
+    let mut fixer_state = HashMap::<ChatId, FixerState>::new();
     let bot = Bot::from_env();
 
     let handler = Update::filter_message()
         .branch(
             dptree::entry()
                 .filter_command::<Command>()
-                .endpoint(commands::handler),
+                .endpoint(|bot, message, command| commands::handler(bot, message, command, &mut fixer_state)),
         )
         .branch(
             dptree::filter(|msg: Message| {

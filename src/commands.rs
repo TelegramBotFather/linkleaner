@@ -1,15 +1,26 @@
 use crate::utils::parse_bool;
 use once_cell::sync::Lazy;
-use std::{env, error::Error, marker::Send};
+use tracing_subscriber::filter;
+use std::{collections::HashMap, env, error::Error, marker::Send};
 use teloxide::{
     payloads::SendMessageSetters,
     prelude::Requester,
-    types::{ChatAction, Message, UserId},
+    types::{ChatAction, ChatId, ChatMember, Message, UserId},
     utils::command::BotCommands,
     Bot,
 };
 
 pub(crate) type FilterState = String;
+
+#[derive(Clone, Copy, Debug, Default)]
+pub(crate) struct FixerState {
+    amp: bool,
+    instagram: bool,
+    medium: bool,
+    twitter: bool,
+    youtube: bool,
+}
+
 static BOT_OWNER: Lazy<UserId> = Lazy::new(|| {
     let value = env::var("BOT_OWNER_ID").expect("BOT_OWNER_ID must be defined");
     let id = value
@@ -47,6 +58,7 @@ pub(crate) async fn handler(
     bot: Bot,
     message: Message,
     command: Command,
+    fixer_state: &mut HashMap<ChatId, FixerState>
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
     match command {
         Command::Help | Command::Start => {
@@ -63,16 +75,23 @@ pub(crate) async fn handler(
         },
         #[cfg(feature = "ddinstagram")]
         Command::Instagram { filter_state } => {
-            if let Some(from) = message.from() && from.id != *BOT_OWNER {
-                bot.send_chat_action(message.chat.id, ChatAction::Typing)
-                    .await?;
-                bot.send_message(message.chat.id, "You are not authorized for this action")
-                    .reply_to_message_id(message.id)
-                    .await?;
-            } else {
+            let admins = bot.get_chat_administrators(message.chat.id).await?;
+            let admins = admins.iter().map(|c| c.user.clone()).collect::<Vec<_>>();
+            if let Some(from) = message.from() && admins.contains(from) {
                 match parse_bool(&filter_state) {
                     Ok(filter_state) => {
-                        crate::instagram::set_filter_state(bot, message, filter_state).await?;
+                        let new_state = if let Some(cur) = fixer_state.get(&message.chat.id) {
+                            FixerState {
+                                instagram: filter_state,
+                                ..*cur
+                            }
+                        } else {
+                            FixerState {
+                                instagram: filter_state,
+                                ..Default::default()
+                            }
+                        };
+                        fixer_state.insert(message.chat.id, new_state);
                     }
                     Err(error_message) => {
                         bot.send_chat_action(message.chat.id, ChatAction::Typing)
@@ -82,19 +101,32 @@ pub(crate) async fn handler(
                             .await?;
                     }
                 }
+            } else {
+                bot.send_chat_action(message.chat.id, ChatAction::Typing)
+                    .await?;
+                bot.send_message(message.chat.id, "You are not authorized for this action")
+                    .reply_to_message_id(message.id)
+                    .await?;
             }
         }
         Command::Medium { filter_state } => {
-            if let Some(from) = message.from() && from.id != *BOT_OWNER {
-                bot.send_chat_action(message.chat.id, ChatAction::Typing)
-                    .await?;
-                bot.send_message(message.chat.id, "You are not authorized for this action")
-                    .reply_to_message_id(message.id)
-                    .await?;
-            } else {
+            let admins = bot.get_chat_administrators(message.chat.id).await?;
+            let admins = admins.iter().map(|c| c.user.clone()).collect::<Vec<_>>();
+            if let Some(from) = message.from() && admins.contains(from) {
                 match parse_bool(&filter_state) {
                     Ok(filter_state) => {
-                        crate::medium::set_filter_state(bot, message, filter_state).await?;
+                        let new_state = if let Some(cur) = fixer_state.get(&message.chat.id) {
+                            FixerState {
+                                medium: filter_state,
+                                ..*cur
+                            }
+                        } else {
+                            FixerState {
+                                medium: filter_state,
+                                ..Default::default()
+                            }
+                        };
+                        fixer_state.insert(message.chat.id, new_state);
                     }
                     Err(error_message) => {
                         bot.send_chat_action(message.chat.id, ChatAction::Typing)
@@ -104,6 +136,12 @@ pub(crate) async fn handler(
                             .await?;
                     }
                 }
+            } else {
+                bot.send_chat_action(message.chat.id, ChatAction::Typing)
+                    .await?;
+                bot.send_message(message.chat.id, "You are not authorized for this action")
+                    .reply_to_message_id(message.id)
+                    .await?;
             }
         }
         Command::Ttv { names } => {
@@ -113,16 +151,23 @@ pub(crate) async fn handler(
                 .await?;
         }
         Command::Twitter { filter_state } => {
-            if let Some(from) = message.from() && from.id != *BOT_OWNER {
-                bot.send_chat_action(message.chat.id, ChatAction::Typing)
-                    .await?;
-                bot.send_message(message.chat.id, "You are not authorized for this action")
-                    .reply_to_message_id(message.id)
-                    .await?;
-            } else {
+            let admins = bot.get_chat_administrators(message.chat.id).await?;
+            let admins = admins.iter().map(|c| c.user.clone()).collect::<Vec<_>>();
+            if let Some(from) = message.from() && admins.contains(from) {
                 match parse_bool(&filter_state) {
                     Ok(filter_state) => {
-                        crate::twitter::set_filter_state(bot, message, filter_state).await?;
+                        let new_state = if let Some(cur) = fixer_state.get(&message.chat.id) {
+                            FixerState {
+                                twitter: filter_state,
+                                ..*cur
+                            }
+                        } else {
+                            FixerState {
+                                twitter: filter_state,
+                                ..Default::default()
+                            }
+                        };
+                        fixer_state.insert(message.chat.id, new_state);
                     }
                     Err(error_message) => {
                         bot.send_chat_action(message.chat.id, ChatAction::Typing)
@@ -132,19 +177,32 @@ pub(crate) async fn handler(
                             .await?;
                     }
                 }
+            } else {
+                bot.send_chat_action(message.chat.id, ChatAction::Typing)
+                    .await?;
+                bot.send_message(message.chat.id, "You are not authorized for this action")
+                    .reply_to_message_id(message.id)
+                    .await?;
             }
         }
         Command::YouTube { filter_state } => {
-            if let Some(from) = message.from() && from.id != *BOT_OWNER {
-                bot.send_chat_action(message.chat.id, ChatAction::Typing)
-                    .await?;
-                bot.send_message(message.chat.id, "You are not authorized for this action")
-                    .reply_to_message_id(message.id)
-                    .await?;
-            } else {
+            let admins = bot.get_chat_administrators(message.chat.id).await?;
+            let admins = admins.iter().map(|c| c.user.clone()).collect::<Vec<_>>();
+            if let Some(from) = message.from() && admins.contains(from) {
                 match parse_bool(&filter_state) {
                     Ok(filter_state) => {
-                        crate::youtube::set_filter_state(bot, message, filter_state).await?;
+                        let new_state = if let Some(cur) = fixer_state.get(&message.chat.id) {
+                            FixerState {
+                                youtube: filter_state,
+                                ..*cur
+                            }
+                        } else {
+                            FixerState {
+                                youtube: filter_state,
+                                ..Default::default()
+                            }
+                        };
+                        fixer_state.insert(message.chat.id, new_state);
                     }
                     Err(error_message) => {
                         bot.send_chat_action(message.chat.id, ChatAction::Typing)
@@ -154,6 +212,12 @@ pub(crate) async fn handler(
                             .await?;
                     }
                 }
+            } else {
+                bot.send_chat_action(message.chat.id, ChatAction::Typing)
+                    .await?;
+                bot.send_message(message.chat.id, "You are not authorized for this action")
+                    .reply_to_message_id(message.id)
+                    .await?;
             }
         }
     };
