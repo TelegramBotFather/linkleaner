@@ -1905,7 +1905,7 @@ checksum = "20f34339676cdcab560c9a82300c4c2581f68b9369aedf0fae86f2ff9565ff3e"
 [[package]]
 name = "teloxide"
 version = "0.17.0"
-source = "git+https://github.com/teloxide/teloxide#8212dda69ef7a02eae5071822b4f253937c3b54a"
+source = "git+https://github.com/teloxide/teloxide#ffe6ebe7b7b2d6897fb1fc0a17dbed8614e2970a"
 dependencies = [
  "aquamarine",
  "bytes",
@@ -1930,7 +1930,7 @@ dependencies = [
 [[package]]
 name = "teloxide-core"
 version = "0.13.0"
-source = "git+https://github.com/teloxide/teloxide#8212dda69ef7a02eae5071822b4f253937c3b54a"
+source = "git+https://github.com/teloxide/teloxide#ffe6ebe7b7b2d6897fb1fc0a17dbed8614e2970a"
 dependencies = [
  "bitflags",
  "bytes",
@@ -1961,7 +1961,7 @@ dependencies = [
 [[package]]
 name = "teloxide-macros"
 version = "0.10.0"
-source = "git+https://github.com/teloxide/teloxide#8212dda69ef7a02eae5071822b4f253937c3b54a"
+source = "git+https://github.com/teloxide/teloxide#ffe6ebe7b7b2d6897fb1fc0a17dbed8614e2970a"
 dependencies = [
  "heck",
  "proc-macro2",
