@@ -145,6 +145,7 @@
             flyctl
             git-cliff
             rustNightly
+            skopeo
             stdenv.cc
           ];
         };
