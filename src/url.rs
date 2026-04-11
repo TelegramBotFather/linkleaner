@@ -43,6 +43,19 @@ pub(crate) fn get_preview_url(url: &Url, from: &str, to: &str) -> String {
     url.as_str().replace(from, to)
 }
 
+pub(crate) fn get_preview_url_with_suffix(
+    url: &Url,
+    from: &str,
+    to: &str,
+    suffix: Option<&str>,
+) -> String {
+    let mut result = get_preview_url(url, from, to);
+    if let Some(s) = suffix {
+        result.push_str(s);
+    }
+    result
+}
+
 fn check_matches_domain(url: &Url, domains: &[&str]) -> bool {
     if let Some(host) = url.host_str() {
         let host = host.trim_start_matches("www.");
@@ -87,7 +100,7 @@ pub fn verify_url_matcher(urls: &[&str], router: &matchit::Router<()>) {
 
 #[cfg(test)]
 mod test {
-    use super::check_matches_domain;
+    use super::{check_matches_domain, get_preview_url_with_suffix};
     use url::Url;
 
     #[test]
@@ -104,5 +117,19 @@ mod test {
         let domains = ["instagram.com"];
         let url = Url::parse(url).unwrap();
         assert!(!check_matches_domain(&url, &domains));
+    }
+
+    #[test]
+    fn get_preview_url_with_suffix_appends_suffix() {
+        let url = Url::parse("https://twitter.com/Jack/status/20").unwrap();
+        let result = get_preview_url_with_suffix(&url, "twitter.com", "fixupx.com", Some("/en"));
+        assert_eq!(result, "https://fixupx.com/Jack/status/20/en");
+    }
+
+    #[test]
+    fn get_preview_url_with_suffix_no_suffix() {
+        let url = Url::parse("https://twitter.com/Jack/status/20").unwrap();
+        let result = get_preview_url_with_suffix(&url, "twitter.com", "fixupx.com", None);
+        assert_eq!(result, "https://fixupx.com/Jack/status/20");
     }
 }

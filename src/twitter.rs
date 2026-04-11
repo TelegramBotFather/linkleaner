@@ -38,4 +38,28 @@ mod test {
             &super::URL_MATCHER,
         );
     }
+
+    #[test]
+    fn test_preview_url_has_en_suffix() {
+        use crate::url::get_preview_url_with_suffix;
+        use url::Url;
+
+        for (input, domain) in &[
+            ("https://twitter.com/Jack/status/20", "twitter.com"),
+            ("https://x.com/Jack/status/20", "x.com"),
+            ("https://mobile.twitter.com/Jack/status/20", "mobile.twitter.com"),
+            ("https://mobile.x.com/Jack/status/20", "mobile.x.com"),
+        ] {
+            let url = Url::parse(input).unwrap();
+            let result = get_preview_url_with_suffix(&url, domain, "fixupx.com", Some("/en"));
+            assert!(
+                result.ends_with("/en"),
+                "Expected preview URL to end with /en, got: {result}"
+            );
+            assert!(
+                result.contains("fixupx.com"),
+                "Expected preview URL to use fixupx.com, got: {result}"
+            );
+        }
+    }
 }

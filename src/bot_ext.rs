@@ -1,6 +1,6 @@
 use crate::{
     AsyncError, get_urls_from_message,
-    url::{get_preview_url, scrub_urls},
+    url::{get_preview_url_with_suffix, scrub_urls},
 };
 use matchit::Router;
 use std::sync::LazyLock;
@@ -123,13 +123,9 @@ impl BotExt for Bot {
                 ]])),
                 _ => None,
             };
-            let mut preview_url = get_preview_url(url, domain, preview_domain);
-            if let Some(suffix) = preview_path_suffix {
-                preview_url.push_str(suffix);
-            }
             let preview_options = LinkPreviewOptions {
                 is_disabled: false,
-                url: Some(preview_url),
+                url: Some(get_preview_url_with_suffix(url, domain, preview_domain, preview_path_suffix)),
                 prefer_small_media: false,
                 prefer_large_media: true,
                 show_above_text: false,
