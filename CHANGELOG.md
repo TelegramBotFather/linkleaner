@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.9.3] - 2026-04-11
+
+### ⚙️ Miscellaneous Tasks
+
+- Fmt
+
 ## [2.9.2] - 2026-04-11
 
 ### 🚀 Features
