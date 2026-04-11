@@ -42,6 +42,7 @@ pub(crate) trait BotExt {
         message: &Message,
         url_matcher: &Router<()>,
         preview_domain: &str,
+        preview_path_suffix: Option<&str>,
         get_button_data: impl Fn(&Url) -> Option<(&str, Url)>,
     ) -> Result<(), AsyncError>;
     fn is_self_message(&self, message: &Message) -> bool;
@@ -103,6 +104,7 @@ impl BotExt for Bot {
         message: &Message,
         url_matcher: &Router<()>,
         preview_domain: &str,
+        preview_path_suffix: Option<&str>,
         get_button_data: impl Fn(&Url) -> Option<(&str, Url)>,
     ) -> Result<(), AsyncError> {
         let urls = get_urls_from_message(message);
@@ -121,9 +123,13 @@ impl BotExt for Bot {
                 ]])),
                 _ => None,
             };
+            let mut preview_url = get_preview_url(url, domain, preview_domain);
+            if let Some(suffix) = preview_path_suffix {
+                preview_url.push_str(suffix);
+            }
             let preview_options = LinkPreviewOptions {
                 is_disabled: false,
-                url: Some(get_preview_url(url, domain, preview_domain)),
+                url: Some(preview_url),
                 prefer_small_media: false,
                 prefer_large_media: true,
                 show_above_text: false,

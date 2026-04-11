@@ -11,7 +11,7 @@ static URL_MATCHER: LazyLock<Router<()>> = LazyLock::new(|| {
 });
 
 pub async fn handler(bot: Bot, message: Message) -> Result<(), AsyncError> {
-    bot.perform_replacement(&message, &URL_MATCHER, "fixthreads.net", |_| None)
+    bot.perform_replacement(&message, &URL_MATCHER, "fixthreads.net", None, |_| None)
         .await?;
     Ok(())
 }

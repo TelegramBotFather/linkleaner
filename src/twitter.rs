@@ -13,7 +13,7 @@ static URL_MATCHER: LazyLock<Router<()>> = LazyLock::new(|| {
 });
 
 pub async fn handler(bot: Bot, message: Message) -> Result<(), AsyncError> {
-    bot.perform_replacement(&message, &URL_MATCHER, "fixupx.com", |url| {
+    bot.perform_replacement(&message, &URL_MATCHER, "fixupx.com", Some("/en"), |url| {
         let mut button_url = url.clone();
         button_url.set_host(Some("xcancel.com")).unwrap();
         Some(("View on Nitter", button_url))
