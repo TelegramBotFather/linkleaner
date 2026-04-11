@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.9.5] - 2026-04-11
+
+### 🐛 Bug Fixes
+
+- Disable GitHub container publishing
+
 ## [2.9.4] - 2026-04-11
 
 ### ⚙️ Miscellaneous Tasks
