@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.9.2] - 2026-04-11
+
+### 🚀 Features
+
+- Add `preview_path_suffix` parameter and enable auto translation for Twitter
+
+### 🐛 Bug Fixes
+
+- *(nix)* Update to Rust 1.92.0
+- *(rust)* Upgrade to Rust 1.93.0
+- *(deps)* Update rust crate rand to 0.10.0
+- Make Darwin devshell actually buildable
+- Add tests for `preview_path_suffix`
+
 ## [2.9.0] - 2025-11-29
 
 ### 🚀 Features
