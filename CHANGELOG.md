@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.9.6] - 2026-04-11
+
+### 🐛 Bug Fixes
+
+- *(ci)* Replace Nix installer with Lix
+- *(ci)* Remove Nix Store cache
+
 ## [2.9.5] - 2026-04-11
 
 ### 🐛 Bug Fixes
