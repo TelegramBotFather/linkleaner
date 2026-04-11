@@ -47,7 +47,10 @@ mod test {
         for (input, domain) in &[
             ("https://twitter.com/Jack/status/20", "twitter.com"),
             ("https://x.com/Jack/status/20", "x.com"),
-            ("https://mobile.twitter.com/Jack/status/20", "mobile.twitter.com"),
+            (
+                "https://mobile.twitter.com/Jack/status/20",
+                "mobile.twitter.com",
+            ),
             ("https://mobile.x.com/Jack/status/20", "mobile.x.com"),
         ] {
             let url = Url::parse(input).unwrap();

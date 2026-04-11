@@ -125,7 +125,12 @@ impl BotExt for Bot {
             };
             let preview_options = LinkPreviewOptions {
                 is_disabled: false,
-                url: Some(get_preview_url_with_suffix(url, domain, preview_domain, preview_path_suffix)),
+                url: Some(get_preview_url_with_suffix(
+                    url,
+                    domain,
+                    preview_domain,
+                    preview_path_suffix,
+                )),
                 prefer_small_media: false,
                 prefer_large_media: true,
                 show_above_text: false,
