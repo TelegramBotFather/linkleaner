@@ -61,26 +61,26 @@ jobs:
           --format v2s2
         nix run .#flyctl deploy
 
-    - name: Log in to GitHub Container Registry
-      uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4
-      with:
-        registry: ghcr.io
-        username: ${{ github.repository_owner }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Build and publish image to GitHub Container Registry
-      shell: bash
-      run: |
-        # Get image details
-        IMAGE_NAME="$(nix eval --raw .#packages.x86_64-linux.ghContainer.imageName)"
-        IMAGE_TAG="$(nix eval --raw .#packages.x86_64-linux.ghContainer.imageTag)"
-
-        # Build and load the image
-        nix build .#ghContainer
-        docker load < ./result
-
-        # Push image to ghcr.io
-        docker push "${IMAGE_NAME}":"${IMAGE_TAG}"
+#     - name: Log in to GitHub Container Registry
+#       uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4
+#       with:
+#         registry: ghcr.io
+#         username: ${{ github.repository_owner }}
+#         password: ${{ secrets.GITHUB_TOKEN }}
+# 
+#     - name: Build and publish image to GitHub Container Registry
+#       shell: bash
+#       run: |
+#         # Get image details
+#         IMAGE_NAME="$(nix eval --raw .#packages.x86_64-linux.ghContainer.imageName)"
+#         IMAGE_TAG="$(nix eval --raw .#packages.x86_64-linux.ghContainer.imageTag)"
+# 
+#         # Build and load the image
+#         nix build .#ghContainer
+#         docker load < ./result
+# 
+#         # Push image to ghcr.io
+#         docker push "${IMAGE_NAME}":"${IMAGE_TAG}"
 
     - name: Get changelog entry
       id: changelog_reader
