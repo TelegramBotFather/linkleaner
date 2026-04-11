@@ -54,7 +54,7 @@
         commonArgs = {
           src = craneLib.cleanCargoSource ./.;
           buildInputs = [ ];
-          nativeBuildInputs = [ ];
+          nativeBuildInputs = pkgs.lib.optionals pkgs.stdenv.isDarwin [ pkgs.libiconv ];
           cargoClippyExtraArgs = "--all-targets -- --deny warnings";
         };
         cargoArtifacts = craneLib.buildDepsOnly commonArgs;
@@ -123,6 +123,12 @@
             {
               name = "DEVSHELL_NO_MOTD";
               value = 1;
+            }
+          ]
+          ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
+            {
+              name = "LIBRARY_PATH";
+              prefix = pkgs.lib.makeLibraryPath commonArgs.nativeBuildInputs;
             }
           ];
 
