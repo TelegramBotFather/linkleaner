@@ -3,6 +3,10 @@ use matchit::Router;
 use std::sync::LazyLock;
 use teloxide::{Bot, types::Message};
 
+static PROVIDER: LazyLock<String> = LazyLock::new(|| {
+    std::env::var("LINKLEANER_REDDIT_PROVIDER").unwrap_or_else(|_| "vxreddit.com".to_string())
+});
+
 static URL_MATCHER: LazyLock<Router<()>> = LazyLock::new(|| {
     let mut router = Router::new();
     add_route!(router, "/r/{username}/comments/{id}/{slug}/{comment}");
@@ -33,7 +37,7 @@ static URL_MATCHER: LazyLock<Router<()>> = LazyLock::new(|| {
 pub const DOMAINS: [&str; 3] = ["reddit.com", "redd.it", "www.reddit.com"];
 
 pub async fn handler(bot: Bot, message: Message) -> Result<(), AsyncError> {
-    bot.perform_replacement(&message, &URL_MATCHER, "vxreddit.com", None, |_| None)
+    bot.perform_replacement(&message, &URL_MATCHER, &PROVIDER, None, |_| None)
         .await?;
     Ok(())
 }

@@ -3,6 +3,10 @@ use matchit::Router;
 use std::sync::LazyLock;
 use teloxide::{Bot, types::Message};
 
+static PROVIDER: LazyLock<String> = LazyLock::new(|| {
+    std::env::var("LINKLEANER_TWITTER_PROVIDER").unwrap_or_else(|_| "fixupx.com".to_string())
+});
+
 pub const DOMAINS: [&str; 4] = ["twitter.com", "mobile.twitter.com", "x.com", "mobile.x.com"];
 static URL_MATCHER: LazyLock<Router<()>> = LazyLock::new(|| {
     let mut router = Router::new();
@@ -13,7 +17,7 @@ static URL_MATCHER: LazyLock<Router<()>> = LazyLock::new(|| {
 });
 
 pub async fn handler(bot: Bot, message: Message) -> Result<(), AsyncError> {
-    bot.perform_replacement(&message, &URL_MATCHER, "fixupx.com", Some("/en"), |url| {
+    bot.perform_replacement(&message, &URL_MATCHER, &PROVIDER, Some("/en"), |url| {
         let mut button_url = url.clone();
         button_url.set_host(Some("xcancel.com")).unwrap();
         Some(("View on Nitter", button_url))
@@ -54,14 +58,15 @@ mod test {
             ("https://mobile.x.com/Jack/status/20", "mobile.x.com"),
         ] {
             let url = Url::parse(input).unwrap();
-            let result = get_preview_url_with_suffix(&url, domain, "fixupx.com", Some("/en"));
+            let result = get_preview_url_with_suffix(&url, domain, &super::PROVIDER, Some("/en"));
             assert!(
                 result.ends_with("/en"),
                 "Expected preview URL to end with /en, got: {result}"
             );
             assert!(
-                result.contains("fixupx.com"),
-                "Expected preview URL to use fixupx.com, got: {result}"
+                result.contains(&*super::PROVIDER),
+                "Expected preview URL to use {}, got: {result}",
+                *super::PROVIDER
             );
         }
     }

@@ -3,6 +3,10 @@ use regex::Regex;
 use std::sync::LazyLock;
 use teloxide::{Bot, types::Message, utils::html::link};
 
+static PROVIDER: LazyLock<String> = LazyLock::new(|| {
+    std::env::var("LINKLEANER_MEDIUM_PROVIDER").unwrap_or_else(|_| "md.vern.cc".to_string())
+});
+
 #[allow(dead_code)] // This is used in the tests
 const HOST_MATCH_GROUP: &str = "host";
 const PATH_MATCH_GROUP: &str = "path";
@@ -30,7 +34,7 @@ pub async fn handler(bot: Bot, message: Message) -> Result<(), AsyncError> {
 fn build_url(caps: &regex::Captures) -> String {
     let mut url = format!(
         "{}/{}/{}",
-        "md.vern.cc", &caps[USER_MATCH_GROUP], &caps[PATH_MATCH_GROUP]
+        *PROVIDER, &caps[USER_MATCH_GROUP], &caps[PATH_MATCH_GROUP]
     )
     // Easier to replace them here than build logic to avoid it in the first place :D
     .replace("//", "/");

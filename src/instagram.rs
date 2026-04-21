@@ -3,6 +3,10 @@ use matchit::Router;
 use std::sync::LazyLock;
 use teloxide::{Bot, types::Message};
 
+static PROVIDER: LazyLock<String> = LazyLock::new(|| {
+    std::env::var("LINKLEANER_INSTAGRAM_PROVIDER").unwrap_or_else(|_| "kkclip.com".to_string())
+});
+
 pub const DOMAINS: [&str; 2] = ["instagram.com", "www.instagram.com"];
 static URL_MATCHER: LazyLock<Router<()>> = LazyLock::new(|| {
     let mut router = Router::new();
@@ -20,7 +24,7 @@ static URL_MATCHER: LazyLock<Router<()>> = LazyLock::new(|| {
 });
 
 pub async fn handler(bot: Bot, message: Message) -> Result<(), AsyncError> {
-    bot.perform_replacement(&message, &URL_MATCHER, "fxstagram.com", None, |_| None)
+    bot.perform_replacement(&message, &URL_MATCHER, &PROVIDER, None, |_| None)
         .await?;
     Ok(())
 }
