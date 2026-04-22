@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.10.1] - 2026-04-22
+
+### 🐛 Bug Fixes
+
+- *(ci)* Remove Nix store cache
+- *(ci)* Remove use of skopeo for manifest generation
+
 ## [2.10.0] - 2026-04-22
 
 ### 🚀 Features
