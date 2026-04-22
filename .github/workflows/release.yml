@@ -103,8 +103,7 @@ jobs:
           copy \
           docker-archive:./containers/container-x86_64-linux/result \
           docker://registry.fly.io/linkleaner:latest-amd64 \
-          --dest-creds x:"$FLY_API_TOKEN" \
-          --format v2s2
+          --dest-creds x:"$FLY_API_TOKEN"
 
         # Push aarch64 image
         nix run .#skopeo -- \
@@ -112,17 +111,14 @@ jobs:
           copy \
           docker-archive:./containers/container-aarch64-linux/result \
           docker://registry.fly.io/linkleaner:latest-arm64 \
-          --dest-creds x:"$FLY_API_TOKEN" \
-          --format v2s2
+          --dest-creds x:"$FLY_API_TOKEN"
 
         # Create and push a multi-arch manifest list combining both arch images
-        nix run .#skopeo -- \
-          --insecure-policy \
-          manifest create \
-          docker://registry.fly.io/linkleaner:latest \
-          docker://registry.fly.io/linkleaner:latest-amd64 \
-          docker://registry.fly.io/linkleaner:latest-arm64 \
-          --creds x:"$FLY_API_TOKEN"
+        docker login registry.fly.io --username x --password-stdin <<< "$FLY_API_TOKEN"
+        docker manifest create registry.fly.io/linkleaner:latest \
+          registry.fly.io/linkleaner:latest-amd64 \
+          registry.fly.io/linkleaner:latest-arm64
+        docker manifest push registry.fly.io/linkleaner:latest
 
         # Deploy using flyctl (picks the right arch from the :latest manifest)
         nix run .#flyctl deploy
@@ -139,8 +135,7 @@ jobs:
           copy \
           docker-archive:./containers/gh-container-x86_64-linux/result \
           docker://ghcr.io/msfjarvis/linkleaner:latest-amd64 \
-          --dest-creds "$GITHUB_ACTOR":"$GITHUB_TOKEN" \
-          --format v2s2
+          --dest-creds "$GITHUB_ACTOR":"$GITHUB_TOKEN"
 
         # Push aarch64 image
         nix run .#skopeo -- \
@@ -148,17 +143,14 @@ jobs:
           copy \
           docker-archive:./containers/gh-container-aarch64-linux/result \
           docker://ghcr.io/msfjarvis/linkleaner:latest-arm64 \
-          --dest-creds "$GITHUB_ACTOR":"$GITHUB_TOKEN" \
-          --format v2s2
+          --dest-creds "$GITHUB_ACTOR":"$GITHUB_TOKEN"
 
         # Create and push a multi-arch manifest list combining both arch images
-        nix run .#skopeo -- \
-          --insecure-policy \
-          manifest create \
-          docker://ghcr.io/msfjarvis/linkleaner:latest \
-          docker://ghcr.io/msfjarvis/linkleaner:latest-amd64 \
-          docker://ghcr.io/msfjarvis/linkleaner:latest-arm64 \
-          --creds "$GITHUB_ACTOR":"$GITHUB_TOKEN"
+        docker login ghcr.io --username "$GITHUB_ACTOR" --password-stdin <<< "$GITHUB_TOKEN"
+        docker manifest create ghcr.io/msfjarvis/linkleaner:latest \
+          ghcr.io/msfjarvis/linkleaner:latest-amd64 \
+          ghcr.io/msfjarvis/linkleaner:latest-arm64
+        docker manifest push ghcr.io/msfjarvis/linkleaner:latest
 
     - name: Get changelog entry
       id: changelog_reader
