@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.10.0] - 2026-04-22
+
+### 🚀 Features
+
+- Use kkclip for instagram and add env var overrides (#73)
+- Build arm64 and amd64 docker images
+
 ## [2.9.6] - 2026-04-11
 
 ### 🐛 Bug Fixes
