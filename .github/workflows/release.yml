@@ -156,7 +156,7 @@ jobs:
       id: changelog_reader
       uses: mindsers/changelog-reader-action@32aa5b4c155d76c94e4ec883a223c947b2f02656 # v2.2.3
       with:
-        version: ${{ env.VERSION }}
+        version: ${{ github.ref_name }}
         path: ./CHANGELOG.md
 
     - name: Create GitHub release
@@ -169,6 +169,4 @@ jobs:
         NOTES_FILE="$(mktemp)"
         printf "%s\n" "${CHANGELOG}" > "${NOTES_FILE}"
 
-        VERSION="$(git tag -l | tail -n1)"
-
-        gh release create "${VERSION}" --notes-file "${NOTES_FILE}" --title "${VERSION}"
+        gh release create "${{ github.ref_name }}" --notes-file "${NOTES_FILE}" --title "${{ github.ref_name }}"
